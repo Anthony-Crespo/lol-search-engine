@@ -1,9 +1,11 @@
 from flask import (Flask, render_template, session, 
                    redirect, url_for, escape, request)
+from request_data import get_summoner
 app = Flask(__name__)
 
 # Set the secret key (session)
-app.secret_key = b'_5#y2L"F4Q8z\n\xec]/'
+app.secret_key = b'_2#y5K"F7Q8x\n\xec]/'
+
 
 @app.route("/")
 def index(name=False):
@@ -36,6 +38,17 @@ def logout():
     # remove the username from the session if it's there
     session.pop('username', None)
     return redirect(url_for('index'))
+
+
+@app.route('/search', methods=['GET', 'POST'])
+# @app.route('/search/<name>')
+def search_summoner():
+    if request.method == 'POST':
+        summoner_name = request.form['summoner']
+        summoner = get_summoner(summoner_name, 'NA')
+        print(summoner['name'])
+        return render_template('search.html', summoner=summoner)
+    return render_template('search.html')
 
 
 # USE FLASK RUN INSTEAD/ export FLASK_APP=app.py / export FLASK_ENV=development / flask run

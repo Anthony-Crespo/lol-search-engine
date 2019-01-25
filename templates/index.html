@@ -6,5 +6,10 @@
   <h1>Hello, you can connect <a href="{{ url_for('login') }}">here</a>!</h1>
 {% endif %}
 {% if session %}
-  <a href="{{ url_for('logout') }}">Logout from session</a>
+  <a href="{{ url_for('search_summoner') }}">Search for a summoner</a> <br>
+  <a href="{{ url_for('profile') }}">Go to profile</a> <br>
+  <a href="{{ url_for('logout') }}">Logout from session</a> <br><br>
 {% endif %}
+
+{% block search %}
+{% endblock %}

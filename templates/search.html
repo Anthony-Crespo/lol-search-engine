@@ -1,0 +1,13 @@
+{% extends "index.html" %}
+{% block search %}
+
+  <form method="post">
+    <input type=text name=summoner>
+    <input type=submit value='search summoner'>
+  </form>
+  {% if summoner %}
+  <p>[ profil icon: {{ summoner['profileIconId'] }} ]</p>
+  <p>{{ summoner['name'] }} (level {{ summoner['summonerLevel'] }})</p>
+  {% endif %}
+
+{% endblock %}

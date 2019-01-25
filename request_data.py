@@ -3,7 +3,7 @@ import requests
 # implement response code needed https://developer.riotgames.com/response-codes.html
 # https://developer.riotgames.com/static-data.html
 
-API_KEY = 'RGAPI-e01a9fc4-76fb-4eaa-979d-2449d316021f'
+API_KEY = 'RGAPI-373aac6d-0ddf-4bf3-8396-1f656a66684d'
 REGION_URL = {
     'BR': 'br1.api.riotgames.com',
     'EUNE': 'eun1.api.riotgames.com',
@@ -113,20 +113,23 @@ def lol_status(region):
 
 # match-v4
 
-
 # SPECTATOR-V4
 
 
-summoner = get_summoner('Make Out Hiil', 'NA')
-print(summoner['name'])
+if __name__ == '__main__':
+    try:
+        summoner = get_summoner('Make Out Hiil', 'NA')
+        print(summoner['name'])
 
-summoner_mastery = get_total_mastery(summoner['id'], 'NA')
-print(summoner_mastery)
+        summoner_mastery = get_total_mastery(summoner['id'], 'NA')
+        print(summoner_mastery)
 
-champions_mastery = get_all_champion_mastery(summoner['id'], 'NA')
-print(champions_mastery[2]['chestGranted'])
+        champions_mastery = get_all_champion_mastery(summoner['id'], 'NA')
+        print(champions_mastery[2]['chestGranted'])
 
-ahri_level = get_champion_mastery(summoner['id'], 103, 'NA')['championLevel']
-print(ahri_level)
+        ahri_level = get_champion_mastery(summoner['id'], 103, 'NA')['championLevel']
+        print(ahri_level)
 
-print(champion_rotations('NA'))
+        print(champion_rotations('NA'))
+    except KeyError:
+        print('Key may be expire')
