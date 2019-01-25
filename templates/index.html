@@ -3,5 +3,8 @@
 {% if name %}
   <h1>Hello {{ name }}!</h1>
 {% else %}
-  <h1>Hello, World!</h1>
+  <h1>Hello, you can connect <a href="{{ url_for('login') }}">here</a>!</h1>
+{% endif %}
+{% if session %}
+  <a href="{{ url_for('logout') }}">Logout from session</a>
 {% endif %}

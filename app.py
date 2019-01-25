@@ -1,20 +1,21 @@
 from flask import (Flask, render_template, session, 
-                  redirect, url_for, escape, request)
+                   redirect, url_for, escape, request)
 app = Flask(__name__)
 
 # Set the secret key (session)
 app.secret_key = b'_5#y2L"F4Q8z\n\xec]/'
 
 @app.route("/")
-@app.route('/hello/<name>')
-def index(name='there'):
+def index(name=False):
+    if session:
+        name = session['username']
     return render_template('index.html', name=name)
 
 
 @app.route('/profile')
 def profile():
     if 'username' in session:
-        return 'Logged in as %s' % escape(session['username'])
+        return 'Logged in as %s' % escape(session['username']) + '<br> <a href="/">Home page</a>'
     return 'You are not logged in'
 
 
@@ -34,7 +35,7 @@ def login():
 def logout():
     # remove the username from the session if it's there
     session.pop('username', None)
-    return redirect(url_for('profile'))
+    return redirect(url_for('index'))
 
 
 # USE FLASK RUN INSTEAD/ export FLASK_APP=app.py / export FLASK_ENV=development / flask run
