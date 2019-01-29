@@ -1,15 +1,57 @@
 <!doctype html>
-<title>Hello from Flask</title>
-{% if name %}
-  <h1>Hello {{ name }}!</h1>
-{% else %}
-  <h1>Hello, you can connect <a href="{{ url_for('login') }}">here</a>!</h1>
-{% endif %}
-{% if session %}
-  <a href="{{ url_for('search_summoner') }}">Search for a summoner</a> <br>
-  <a href="{{ url_for('profile') }}">Go to profile</a> <br>
-  <a href="{{ url_for('logout') }}">Logout from session</a> <br><br>
-{% endif %}
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="stylesheet" type="text/css" href="../static/css/normalize.css">
+    <link rel="stylesheet" type="text/css" href="../static/css/style.css">
+    <title>Search</title>
+  </head>
+  <body>
+    <div class="top-menu">
+      <div id="logo">Ninja Search</div>
+      <div>
+        <a href="#">Champion</a>
+        <a href="#">Stats</a>
+        <a href="#">Leaderboards</a>
+        <a href="#">My stats</a>
+      </div>
+      <div>
+        <a href="#">Log In</a>
+        <a href="#">Sign Up</a>
+      </div>
+    </div>
+    <div class="search">
+      <div class="doodle"></div>
+      <div class="search-bar">
+        <form method="post">
+          <input type=text name=summoner>
+          <input type=submit value='search'>
+        </form>
+      </div>
 
-{% block search %}
-{% endblock %}
+      <div>
+        {% if name %}
+        <h1>Hello {{ name }}!</h1>
+        {% else %}
+          <h1>Hello, you can connect <a href="{{ url_for('login') }}">here</a>!</h1>
+        {% endif %}
+        {% if session %}
+          <a href="{{ url_for('search_summoner') }}">Search for a summoner</a> <br>
+          <a href="{{ url_for('profile') }}">Go to profile</a> <br>
+          <a href="{{ url_for('logout') }}">Logout from session</a> <br><br>
+        {% endif %}
+      </div>
+
+      {% if summoner %}
+        <div>
+          <p>[ profil icon: {{ summoner['profileIconId'] }} ]</p>
+          <p>{{ summoner['name'] }} (level {{ summoner['summonerLevel'] }})</p>
+        </div>
+      {% endif %}
+    </div>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script type="text/javascript" src="../static/js/script.js"></script>
+  </body>
+</html>

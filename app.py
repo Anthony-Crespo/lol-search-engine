@@ -47,8 +47,8 @@ def search_summoner():
         summoner_name = request.form['summoner']
         summoner = get_summoner(summoner_name, 'NA')
         print(summoner['name'])
-        return render_template('search.html', summoner=summoner)
-    return render_template('search.html')
+        return render_template('index.html', summoner=summoner)
+    return render_template('index.html')
 
 
 # USE FLASK RUN INSTEAD/ export FLASK_APP=app.py / export FLASK_ENV=development / flask run
