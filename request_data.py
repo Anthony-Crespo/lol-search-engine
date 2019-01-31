@@ -3,7 +3,7 @@ import requests
 # implement response code needed https://developer.riotgames.com/response-codes.html
 # https://developer.riotgames.com/static-data.html
 
-API_KEY = 'RGAPI-373aac6d-0ddf-4bf3-8396-1f656a66684d'
+API_KEY = 'RGAPI-95f5d4be-f544-40fc-9610-16e3e589a7dd'
 REGION_URL = {
     'BR': 'br1.api.riotgames.com',
     'EUNE': 'eun1.api.riotgames.com',
@@ -112,6 +112,34 @@ def lol_status(region):
 
 
 # match-v4
+# possibility to filter by champion, queu, season, endtime
+def get_match_history(accountId, region):
+    """return matches history
+    
+    {
+        matches: [
+            {
+            platformId: "NA1",
+            gameId: 2966195073,
+            champion: 145,
+            queue: 420,
+            season: 11,
+            timestamp: 1548956679286,
+            role: "DUO_CARRY",
+            lane: "BOTTOM"
+            },
+            {...}
+        ],
+        startIndex: 0,
+        endIndex: 100,
+        totalGames: 192
+    {
+    """
+    url = 'https://' + REGION_URL[region]
+    urn = f'/lol/match/v4/matchlists/by-account/{accountId}?api_key={API_KEY}'
+    uri = url + urn
+    request = requests.get(uri)
+    return request.json()
 
 # SPECTATOR-V4
 
@@ -131,5 +159,7 @@ if __name__ == '__main__':
         print(ahri_level)
 
         print(champion_rotations('NA'))
+
+        print(get_match_history(summoner['accountId'], 'NA'))
     except KeyError:
         print('Key may be expire')

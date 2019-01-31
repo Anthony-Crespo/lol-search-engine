@@ -1,6 +1,6 @@
 from flask import (Flask, render_template, session, 
                    redirect, url_for, escape, request)
-from request_data import get_summoner
+from request_data import get_summoner, get_match_history
 app = Flask(__name__)
 
 # Set the secret key (session)
@@ -46,8 +46,8 @@ def search_summoner():
     if request.method == 'POST':
         summoner_name = request.form['summoner']
         summoner = get_summoner(summoner_name, 'NA')
-        print(summoner['name'])
-        return render_template('index.html', summoner=summoner)
+        matches = get_match_history(summoner['accountId'], 'NA')['matches']
+        return render_template('index.html', summoner=summoner, matches=matches)
     return render_template('index.html')
 
 

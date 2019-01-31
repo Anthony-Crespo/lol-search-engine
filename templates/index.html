@@ -24,7 +24,7 @@
     <div class="search">
       <div class="doodle"></div>
       <div class="search-bar">
-        <form method="post">
+        <form method="post" action="/search">
           <input type=text name=summoner>
           <input type=submit value='search'>
         </form>
@@ -49,6 +49,20 @@
           <p>{{ summoner['name'] }} (level {{ summoner['summonerLevel'] }})</p>
         </div>
       {% endif %}
+      {% if matches %}
+      <!-- tags are inappropriate and for test -->
+        {% for matche in matches %}
+        <div>
+          {% for k, v in matche.items() %}
+          <p>
+            <span>{{ k }}</span>: <span>{{ v }}</span>
+          </p>
+          {% endfor %}
+        </div>
+        {% endfor %}
+
+      {% endif %}
+      
     </div>
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
