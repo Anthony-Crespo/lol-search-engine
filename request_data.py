@@ -111,8 +111,8 @@ def lol_status(region):
     return request.json()
 
 
-# match-v4
-# possibility to filter by champion, queu, season, endtime
+# there is more match-v4
+# possibility to filter by endtime, timstamp
 def get_match_history(accountId, region):
     """return matches history
     
@@ -141,6 +141,27 @@ def get_match_history(accountId, region):
     request = requests.get(uri)
     return request.json()
 
+
+def get_match_history_filter(accountId, region, champion = False, queue = False, season = False):
+    """return matches history with filter options
+    champion[int]: Set of champion IDs for filtering the matchlist.
+    queue[int]: Set of queue IDs for filtering the matchlist.
+    season[int]: Set of season IDs for filtering the matchlist.
+    """
+    url = 'https://' + REGION_URL[region]
+
+    # add check test if variables are int's
+    # TypeError: can only concatenate str (not "int") to str
+    champion = '' if False else 'champion=' + champion + '&'
+    queue = '' if False else 'queue=' + queue + '&'
+    season = '' if False else 'season=' + season + '&'
+
+    urn = f'/lol/match/v4/matchlists/by-account/{accountId}?{champion}{queue}{season}api_key={API_KEY}'
+    uri = url + urn
+    print(uri)
+    request = requests.get(uri)
+    return request.json()
+
 # SPECTATOR-V4
 
 
@@ -160,6 +181,7 @@ if __name__ == '__main__':
 
         print(champion_rotations('NA'))
 
-        print(get_match_history(summoner['accountId'], 'NA'))
+        # print(get_match_history(summoner['accountId'], 'NA'))
+        get_match_history_filter(summoner['id'], 'NA', champion = '2', queue = '1', season = '3')
     except KeyError:
         print('Key may be expire')
