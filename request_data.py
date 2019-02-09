@@ -3,7 +3,7 @@ import requests
 # implement response code needed https://developer.riotgames.com/response-codes.html
 # https://developer.riotgames.com/static-data.html
 
-API_KEY = 'RGAPI-95f5d4be-f544-40fc-9610-16e3e589a7dd'
+API_KEY = 'RGAPI-63c4d765-ab87-4ced-a5bc-cf16e943743b'
 REGION_URL = {
     'BR': 'br1.api.riotgames.com',
     'EUNE': 'eun1.api.riotgames.com',
@@ -35,18 +35,24 @@ def get_summoner(summoner_name, region):
     }
     """
     url = 'https://' + REGION_URL[region]
-    urn = f'/lol/summoner/v4/summoners/by-name/{summoner_name}?api_key={API_KEY}'
+    urn = f'/lol/summoner/v4/summoners/by-name/{summoner_name}'
     uri = url + urn
-    request = requests.get(uri)
+    params = {
+        'api_key' : API_KEY
+    }
+    request = requests.get(uri, params=params)
     return request.json()
 
 
 def get_total_mastery(encrypted_summoner_id, region):
     """return an int, the total summoner mastery"""
     url = 'https://' + REGION_URL[region]
-    urn = f'/lol/champion-mastery/v4/scores/by-summoner/{encrypted_summoner_id}?api_key={API_KEY}'
+    urn = f'/lol/champion-mastery/v4/scores/by-summoner/{encrypted_summoner_id}'
     uri = url + urn
-    request = requests.get(uri)
+    params = {
+        'api_key' : API_KEY
+    }
+    request = requests.get(uri, params=params)
     return request.json()
 
 
@@ -68,22 +74,28 @@ def get_all_champion_mastery(encrypted_summoner_id, region):
     ]
     """
     url = 'https://' + REGION_URL[region]
-    urn = f'/lol/champion-mastery/v4/champion-masteries/by-summoner/{encrypted_summoner_id}?api_key={API_KEY}'
+    urn = f'/lol/champion-mastery/v4/champion-masteries/by-summoner/{encrypted_summoner_id}'
     uri = url + urn
-    request = requests.get(uri)
+    params = {
+        'api_key' : API_KEY
+    }
+    request = requests.get(uri, params=params)
     return request.json()
 
 
 def get_champion_mastery(encrypted_summoner_id, champion_id, region):
     """return a champion mastery stats of specified summoner"""
     url = 'https://' + REGION_URL[region]
-    urn = f'/lol/champion-mastery/v4/champion-masteries/by-summoner/{encrypted_summoner_id}/by-champion/{champion_id}?api_key={API_KEY}'
+    urn = f'/lol/champion-mastery/v4/champion-masteries/by-summoner/{encrypted_summoner_id}/by-champion/{champion_id}'
     uri = url + urn
-    request = requests.get(uri)
+    params = {
+        'api_key' : API_KEY
+    }
+    request = requests.get(uri, params=params)
     return request.json()
 
 
-def champion_rotations(region):
+def get_champion_rotations(region):
     """return a champion mastery stats of specified summoner
     {
         'freeChampionIds': [2, 4, 8, 22, 32, 53, 78, 89, 102, 113, 133, 141, 157, 222], 
@@ -92,9 +104,12 @@ def champion_rotations(region):
     }
     """
     url = 'https://' + REGION_URL[region]
-    urn = f'/lol/platform/v3/champion-rotations?api_key=' + API_KEY
+    urn = f'/lol/platform/v3/champion-rotations'
     uri = url + urn
-    request = requests.get(uri)
+    params = {
+        'api_key' : API_KEY
+    }
+    request = requests.get(uri, params=params)
     return request.json()
 
 
@@ -105,17 +120,23 @@ def champion_rotations(region):
 def lol_status(region):
     """Server info & status"""
     url = 'https://' + REGION_URL[region]
-    urn = '/lol/status/v3/shard-data?api_key=' + API_KEY
+    urn = '/lol/status/v3/shard-data'
     uri = url + urn
-    request = requests.get(uri)
+    params = {
+        'api_key' : API_KEY
+    }
+    request = requests.get(uri, params=params)
     return request.json()
 
 
 # there is more match-v4
 # possibility to filter by endtime, timstamp
-def get_match_history(accountId, region):
-    """return matches history
-    
+def get_match_history_filter(accountId, region, champion = False, queue = False, season = False):
+    """return match history with optional filter
+    champion[int]: Set of champion IDs for filtering the matchlist.
+    queue[int]: Set of queue IDs for filtering the matchlist. (420 for rank, 400 for normal)
+    season[int]: Set of season IDs for filtering the matchlist.
+
     {
         matches: [
             {
@@ -136,30 +157,15 @@ def get_match_history(accountId, region):
     {
     """
     url = 'https://' + REGION_URL[region]
-    urn = f'/lol/match/v4/matchlists/by-account/{accountId}?api_key={API_KEY}'
+    urn = f'/lol/match/v4/matchlists/by-account/{accountId}'
     uri = url + urn
-    request = requests.get(uri)
-    return request.json()
-
-
-def get_match_history_filter(accountId, region, champion = False, queue = False, season = False):
-    """return matches history with filter options
-    champion[int]: Set of champion IDs for filtering the matchlist.
-    queue[int]: Set of queue IDs for filtering the matchlist.
-    season[int]: Set of season IDs for filtering the matchlist.
-    """
-    url = 'https://' + REGION_URL[region]
-
-    # add check test if variables are int's
-    # TypeError: can only concatenate str (not "int") to str
-    champion = '' if False else 'champion=' + champion + '&'
-    queue = '' if False else 'queue=' + queue + '&'
-    season = '' if False else 'season=' + season + '&'
-
-    urn = f'/lol/match/v4/matchlists/by-account/{accountId}?{champion}{queue}{season}api_key={API_KEY}'
-    uri = url + urn
-    print(uri)
-    request = requests.get(uri)
+    params = {
+        'champion' : '',
+        'queue' : '',
+        'season' : '',
+        'api_key' : API_KEY
+    }
+    request = requests.get(uri, params=params)
     return request.json()
 
 # SPECTATOR-V4
@@ -167,21 +173,13 @@ def get_match_history_filter(accountId, region, champion = False, queue = False,
 
 if __name__ == '__main__':
     try:
-        summoner = get_summoner('Make Out Hiil', 'NA')
-        print(summoner['name'])
-
-        summoner_mastery = get_total_mastery(summoner['id'], 'NA')
-        print(summoner_mastery)
-
-        champions_mastery = get_all_champion_mastery(summoner['id'], 'NA')
-        print(champions_mastery[2]['chestGranted'])
-
-        ahri_level = get_champion_mastery(summoner['id'], 103, 'NA')['championLevel']
-        print(ahri_level)
-
-        print(champion_rotations('NA'))
-
-        # print(get_match_history(summoner['accountId'], 'NA'))
-        get_match_history_filter(summoner['id'], 'NA', champion = '2', queue = '1', season = '3')
+        print(get_summoner('Make Out Hiil', 'NA')['name'])
+        # print(get_total_mastery(summoner['id'], 'NA'))
+        # print(get_all_champion_mastery(summoner['id'], 'NA')[2]['chestGranted'])
+        # print(get_champion_mastery(summoner['id'], 103, 'NA')['championLevel'])
+        # print(get_champion_rotations('NA'))
+        # print(lol_status('NA'))
+        # print(get_match_history_filter(summoner['accountId'], 'NA', champion = '2', queue = '1', season = '11'))
+        
     except KeyError:
         print('Key may be expire')
