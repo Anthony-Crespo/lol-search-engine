@@ -1,6 +1,6 @@
 import requests
-from apis.errors import notOk, SummonerNameInvalid
-from apis.validators import summoner_name_valid
+from .errors import notOk, SummonerNameInvalid
+from .validators import summoner_name_valid
 
 REGION_URL = {
             'BR': 'https://br1.api.riotgames.com',
