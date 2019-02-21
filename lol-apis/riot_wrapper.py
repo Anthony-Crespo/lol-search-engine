@@ -2,10 +2,15 @@ from apis import RiotApi
 from apis import SummonerNameInvalid, SummonerNotFound
 from requests import HTTPError
 
-riot_api = RiotApi(
-    api_key='RGAPI-802113b9-a5ea-4f2c-8ce4-c7df1dee1b9d', 
-    region="NA"
-)
+try:
+    riot_api = RiotApi(
+        api_key='RGAPI-802113b9-a5ea-4f2c-8ce4-c7df1dee1b9d', 
+        region="NA"
+    )
+except TypeError:
+    pass  # key can only be a string in set_api_key()
+except KeyError:
+    pass  # region not in dict
 
 # CHANGE TO MAKE:
 # to save api ressource dont generate unimportant object var value yet
@@ -31,6 +36,8 @@ try:
 except SummonerNameInvalid:
     pass
 except SummonerNotFound:
+    pass
+except NameError:
     pass
 except HTTPError:
     pass
