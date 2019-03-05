@@ -4,6 +4,9 @@ class SummonerNotFound(Exception):
 class SummonerNameInvalid(Exception):
     """Summoner name is not valid"""
 
+class OverRateLimit(Exception):
+    "Rate limit exceeded"
+
 # error name name an update
 class ApiKeyError(Exception):
     """API key is wrong or expired or endpoint got removed"""
@@ -28,11 +31,11 @@ def notOk(response):
         raise SummonerNotFound(
             "Summoner was not found and may not exist (error 404)")
     elif response.status_code == 429:
-        raise NameError("The rate limit was exceeded (error 424)")
+        raise OverRateLimit("The rate limit was exceeded (error 424)")
     elif response.status_code == 403:
         raise ApiKeyError(
             "Riot API key may be wrong or expired" 
-            " or endpoints need an update (error 403)"
+            " and/or endpoints need an update (error 403)"
         )
     else:
         response.raise_for_status()

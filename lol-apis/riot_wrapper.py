@@ -1,10 +1,10 @@
 from apis import RiotApi
-from apis import SummonerNameInvalid, SummonerNotFound
+from apis import SummonerNameInvalid, SummonerNotFound, OverRateLimit
 from requests import HTTPError
 
 try:
     riot_api = RiotApi(
-        api_key='RGAPI-802113b9-a5ea-4f2c-8ce4-c7df1dee1b9d', 
+        api_key='RGAPI-2cac5af8-6bd9-4581-ae16-354530b665c7', 
         region="NA"
     )
 except TypeError:
@@ -30,14 +30,14 @@ class Summoner():
         self.mastery_score = riot_api.get_total_mastery(self.id)
 
 try:
-    player = Summoner('pla2k33e3kebjyer')
+    player = Summoner('player')
     print(player.summoner_level)
     print(player.mastery_score)
 except SummonerNameInvalid:
     pass
 except SummonerNotFound:
     pass
-except NameError:
+except OverRateLimit:
     pass
 except HTTPError:
     pass
