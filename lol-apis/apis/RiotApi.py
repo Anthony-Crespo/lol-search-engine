@@ -75,8 +75,7 @@ class RiotApi:
             Customs errors from notOk : if response status code not 200
 
         """
-        # add 'if region not in REGION_URL' for bad region value to test
-        if not region:
+        if not region or region not in REGION_URL:
             region = self.default_region
         if not summoner_name_valid(name):
             raise SummonerNameInvalid(
@@ -106,11 +105,12 @@ class RiotApi:
             Customs errors from notOk : if response status code not 200
 
         """
-        # add 'if region not in REGION_URL' for bad region value to test
-        if not region:
+        if not region or region not in REGION_URL:
             region = self.default_region
 
-        url = REGION_URL[region] + '/lol/champion-mastery/v4/scores/by-summoner/' + summoner_id
+        url = (REGION_URL[region] 
+            + '/lol/champion-mastery/v4/scores/by-summoner/' + summoner_id
+        )
         params = {
             'api_key' : self.api_key
         }
