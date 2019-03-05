@@ -3,7 +3,9 @@ import requests
 # implement response code needed https://developer.riotgames.com/response-codes.html
 # https://developer.riotgames.com/static-data.html
 
-API_KEY = 'RGAPI-63c4d765-ab87-4ced-a5bc-cf16e943743b'
+API_KEY = ''
+default_region = "NA"
+# possible bug when in a function a region is misspell
 REGION_URL = {
     'BR': 'br1.api.riotgames.com',
     'EUNE': 'eun1.api.riotgames.com',
@@ -131,7 +133,8 @@ def lol_status(region):
 
 # there is more match-v4
 # possibility to filter by endtime, timstamp
-def get_match_history_filter(accountId, region, champion = False, queue = False, season = False):
+# add error message when no result like when wrong season provided
+def get_match_history(accountId, region, champion = False, queue = False, season = False):
     """return match history with optional filter
     champion[int]: Set of champion IDs for filtering the matchlist.
     queue[int]: Set of queue IDs for filtering the matchlist. (420 for rank, 400 for normal)
@@ -168,6 +171,107 @@ def get_match_history_filter(accountId, region, champion = False, queue = False,
     request = requests.get(uri, params=params)
     return request.json()
 
+
+def get_match(matchId, region):
+    """ return specific match complete data
+    {
+        gameId: 2966195073,
+        platformId: "NA1",
+        gameCreation: 1548956679286,
+        gameDuration: 2320,
+        queueId: 420,
+        mapId: 11,
+        seasonId: 11,
+        gameVersion: "9.2.261.2172",
+        gameMode: "CLASSIC",
+        gameType: "MATCHED_GAME",
+        teams: [
+            {
+                teamId: 100,
+                win: "Fail",
+                firstBlood: true,
+                firstTower: false,
+                firstInhibitor: false,
+                firstBaron: false,
+                firstDragon: false,
+                firstRiftHerald: false,
+                towerKills: 2,
+                inhibitorKills: 0,
+                baronKills: 0,
+                dragonKills: 0,
+                vilemawKills: 0,
+                riftHeraldKills: 0,
+                dominionVictoryScore: 0,
+                bans: [
+                    {
+                    championId: 122,
+                    pickTurn: 1
+                    },
+                    {...}
+                ]
+            },
+            {...} # second team
+        ],
+        participants: [
+            {
+                participantId: 1,
+                teamId: 100,
+                championId: 157,
+                spell1Id: 14,
+                spell2Id: 4,
+                # stats contain object like: win::bool, item0 to item6, killingSprees, 
+                # totalDamageDealt, firstTowerAssist... for a total of 104 stats
+                stats: {},
+                # collection of stats in different time of the game
+                timeline: {
+                    participantId: 1,
+                    creepsPerMinDeltas: {
+                        10-20: 3.2,
+                        0-10: 5.1,
+                        30-end: 4,
+                        20-30: 4.4
+                    },
+                    xpPerMinDeltas: {...},
+                    goldPerMinDeltas: {...},
+                    csDiffPerMinDeltas: {...},
+                    xpDiffPerMinDeltas: {...},
+                    damageTakenPerMinDeltas: {...},
+                    damageTakenDiffPerMinDeltas: {...},
+                    role: "SOLO",
+                    lane: "MIDDLE"
+                }
+            },
+            {...}
+        ],
+        participantIdentities: [
+            {...},
+            {
+                participantId: 2,
+                player: {
+                    platformId: "NA1",
+                    accountId: "MJxiqoVNpc9tLuun_0WcVHMdieivMMgYtR-XGTffbOmkUw",
+                    summonerName: "Make Out HiIl",
+                    summonerId: "gU6uRQTiPoE3MZpIXPR04LIuxq38e-twK-B6oMFeQ-cngck",
+                    currentPlatformId: "NA1",
+                    currentAccountId: "MJxiqoVNpc9tLuun_0WcVHMdieivMMgYtR-XGTffbOmkUw",
+                    matchHistoryUri: "/v1/stats/player_history/NA1/46212752",
+                    profileIcon: 2072
+                }
+            },
+            {...}
+        ]
+    }
+    """
+    url = 'https://' + REGION_URL[region]
+    urn = f'/lol/match/v4/matches/{matchId}'
+    uri = url + urn
+    params = {
+        'api_key' : API_KEY
+    }
+    request = requests.get(uri, params=params)
+    return request.json()
+
+
 # SPECTATOR-V4
 
 
@@ -179,7 +283,8 @@ if __name__ == '__main__':
         # print(get_champion_mastery(summoner['id'], 103, 'NA')['championLevel'])
         # print(get_champion_rotations('NA'))
         # print(lol_status('NA'))
-        # print(get_match_history_filter(summoner['accountId'], 'NA', champion = '2', queue = '1', season = '11'))
+        # print(get_match_history(summoner['accountId'], 'NA', champion = '2', queue = '1', season = '11'))
+        print(get_match('2966195073', 'NA'))
         
     except KeyError:
-        print('Key may be expire')
+        print('Wrong or expired key')
