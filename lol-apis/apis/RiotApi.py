@@ -60,6 +60,13 @@ class RiotApi:
         """The wrapper aka decorator function for requests"""
         pass
 
+    def region_valid(self, region: str):
+        """Return region if valid or default region if not"""
+        if not region or region not in REGION_URL:
+            return self.default_region
+        else:
+            return region
+
     # Possibility to implement search by account ID, PUUID, summoner ID
     def get_summoner(self, name: str, region: str = ''):
         """SUMMONER-V4 on Riot API (More in Riot official docs)
@@ -75,8 +82,7 @@ class RiotApi:
             Customs errors from notOk : if response status code not 200
 
         """
-        if not region or region not in REGION_URL:
-            region = self.default_region
+        region = self.region_valid(region)
         if not summoner_name_valid(name):
             raise SummonerNameInvalid(
                 "Summoner name contain invalid characters"
@@ -105,8 +111,7 @@ class RiotApi:
             Customs errors from notOk : if response status code not 200
 
         """
-        if not region or region not in REGION_URL:
-            region = self.default_region
+        region = self.region_valid(region)
 
         url = (REGION_URL[region] 
             + '/lol/champion-mastery/v4/scores/by-summoner/' + summoner_id

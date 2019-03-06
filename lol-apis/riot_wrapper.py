@@ -4,7 +4,7 @@ from requests import HTTPError
 
 try:
     riot_api = RiotApi(
-        api_key='RGAPI-2cac5af8-6bd9-4581-ae16-354530b665c7', 
+        api_key='', 
         region="NA"
     )
 except TypeError:
@@ -26,7 +26,6 @@ class Summoner():
         self.profile_icon_id = summoner_data['profileIconId']
         self.revision_date = summoner_data['revisionDate']
         self.summoner_level = summoner_data['summonerLevel']
-
         self.mastery_score = riot_api.get_total_mastery(self.id)
 
 try:
