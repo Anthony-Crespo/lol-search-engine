@@ -13,10 +13,8 @@ except TypeError:
 except KeyError:
     pass  # region not in dict
 
-# CHANGE TO MAKE:
-# to save api ressource dont generate unimportant object var value yet
-# but when the value is first acceded (grouped by api request)
-    # maybe use @property to acces value and if its empty just create it
+
+# Replace this class with the Summoner Model class
 class Summoner():
     """Summoner class is created from RiotApi request to Riot official Api"""
     def __init__(self, summoner_name, region = riot_api.default_region):
@@ -28,20 +26,26 @@ class Summoner():
         self.profile_icon_id = summoner_data['profileIconId']
         self.revision_date = summoner_data['revisionDate']
         self.level = summoner_data['summonerLevel']
-        self.mastery_score = riot_api.get_total_mastery(self.id)
+
+        if not summoner_data_in_db:
+            self.mastery_score = riot_api.get_total_mastery(self.id)
+        else:
+            self.mastery_score = riot_api.get_total_mastery(self.id)
 
 
-def summoner_in_db(summoner: Summoner):
-    """Check if a summoner is in the database
-    return False if not in database
-    return True if in database
+def summoner_data_in_db(summoner: Summoner):
+    """Check if a summoner is in the database and up to date
+    return False if not in database or outdated
+    return True if in database and up to date
     Note: this don't update the database"""
     try:
         data = Summoner_tb.select().where(
             Summoner_tb.name == summoner.name
         ).get()
-        if data:
+        if str(data.revisionDate) == str(summoner.revision_date):
             return True
+        else:
+            return False
     except Exception:
         return False
 
