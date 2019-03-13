@@ -1,5 +1,6 @@
 from apis import RiotApi
 from apis import SummonerNameInvalid, SummonerNotFound, OverRateLimit
+from summoners import IntegrityError, Summoner as Summoner_tb
 from requests import HTTPError
 
 try:
@@ -22,16 +23,54 @@ class Summoner():
         # need a try block for not found summoner
         summoner_data = riot_api.get_summoner(summoner_name, region)
         self.id = summoner_data['id']
+        self.region = riot_api.default_region
         self.name = summoner_data['name']
         self.profile_icon_id = summoner_data['profileIconId']
         self.revision_date = summoner_data['revisionDate']
-        self.summoner_level = summoner_data['summonerLevel']
+        self.level = summoner_data['summonerLevel']
         self.mastery_score = riot_api.get_total_mastery(self.id)
+
+
+def summoner_in_db(summoner: Summoner):
+    """Check if a summoner is in the database
+    return False if not in database
+    return True if in database
+    Note: this don't update the database"""
+    try:
+        data = Summoner_tb.select().where(
+            Summoner_tb.name == summoner.name
+        ).get()
+        if data:
+            return True
+    except Exception:
+        return False
+
+def store_summoner(summoner: Summoner):
+    """store summoner in DB or if it's already there update it if outdated"""
+    try:
+        Summoner_tb.create(
+            region = summoner.region,
+            name = summoner.name,
+            profile_icon_id = summoner.profile_icon_id,
+            revisionDate = summoner.revision_date,
+            level = summoner.level,
+            mastery_score = summoner.mastery_score
+        )
+    except IntegrityError:
+        summoner_row = Summoner_tb.get(name=summoner.name)
+        if str(summoner_row.revisionDate) != str(summoner.revision_date):
+            summoner_row.profile_icon_id = summoner.profile_icon_id,
+            summoner_row.revisionDate = summoner.revision_date,
+            summoner_row.level = summoner.level,
+            summoner_row.mastery_score = summoner.mastery_score
+            summoner_row.save()
+
 
 try:
     player = Summoner('player')
-    print(player.summoner_level)
+    print(player.level)
     print(player.mastery_score)
+    store_summoner(player)
 except SummonerNameInvalid:
     pass
 except SummonerNotFound:
