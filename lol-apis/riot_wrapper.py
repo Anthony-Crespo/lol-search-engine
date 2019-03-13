@@ -1,6 +1,6 @@
 from apis import RiotApi
 from apis import SummonerNameInvalid, SummonerNotFound, OverRateLimit
-from summoners import IntegrityError, Summoner as Summoner_tb
+from summoners import IntegrityError, DoesNotExist, Summoner
 from requests import HTTPError
 
 try:
@@ -14,67 +14,64 @@ except KeyError:
     pass  # region not in dict
 
 
-# Replace this class with the Summoner Model class
-class Summoner():
-    """Summoner class is created from RiotApi request to Riot official Api"""
-    def __init__(self, summoner_name, region = riot_api.default_region):
-        # need a try block for not found summoner
-        summoner_data = riot_api.get_summoner(summoner_name, region)
-        self.id = summoner_data['id']
-        self.region = riot_api.default_region
-        self.name = summoner_data['name']
-        self.profile_icon_id = summoner_data['profileIconId']
-        self.revision_date = summoner_data['revisionDate']
-        self.level = summoner_data['summonerLevel']
-
-        if not summoner_data_in_db:
-            self.mastery_score = riot_api.get_total_mastery(self.id)
+def summoner_db(summoner_name, region = riot_api.default_region):
+    """Return the summoner row
+    
+    Request data to api 
+    if up to date in DB return row and stop requesting data from apis
+    else update before returning
+    if summoner missing from DB create row before returning it
+    """
+    summoner = riot_api.get_summoner(summoner_name, region)
+    try:
+        summoner_row = Summoner.get(name=summoner['name'], region=region)
+        if summoner['revisionDate'] == summoner_row.revisionDate:
+            pass
         else:
-            self.mastery_score = riot_api.get_total_mastery(self.id)
+            summoner_row.profile_icon_id = summoner['profileIconId']
+            summoner_row.revisionDate = summoner['revisionDate']
+            summoner_row.level = summoner['summonerLevel']
+            summoner_row.mastery_score = riot_api.get_total_mastery(summoner['id'])
+            summoner_row.save()
+        return summoner_row
+    except DoesNotExist:
+        try:
+            Summoner.create(
+                region = region,
+                name = summoner['name'],
+                profile_icon_id = summoner['profileIconId'],
+                revisionDate = summoner['revisionDate'],
+                level = summoner['summonerLevel'],
+                mastery_score = riot_api.get_total_mastery(summoner['id'])
+            )
+            return Summoner.get(name=summoner['name'], region=region)
+        except IntegrityError:
+            pass
 
 
-def summoner_data_in_db(summoner: Summoner):
+def summoner_data_in_db(summoner_name: str, summoner_region: str):
     """Check if a summoner is in the database and up to date
     return False if not in database or outdated
     return True if in database and up to date
     Note: this don't update the database"""
+    summoner = riot_api.get_summoner(summoner_name, summoner_region)
     try:
-        data = Summoner_tb.select().where(
-            Summoner_tb.name == summoner.name
+        data = Summoner.select().where(
+            Summoner.name == summoner['name'],
+            Summoner.region == riot_api.default_region
         ).get()
-        if str(data.revisionDate) == str(summoner.revision_date):
+        if data.revisionDate == summoner['revisionDate']:
             return True
         else:
             return False
     except Exception:
         return False
 
-def store_summoner(summoner: Summoner):
-    """store summoner in DB or if it's already there update it if outdated"""
-    try:
-        Summoner_tb.create(
-            region = summoner.region,
-            name = summoner.name,
-            profile_icon_id = summoner.profile_icon_id,
-            revisionDate = summoner.revision_date,
-            level = summoner.level,
-            mastery_score = summoner.mastery_score
-        )
-    except IntegrityError:
-        summoner_row = Summoner_tb.get(name=summoner.name)
-        if str(summoner_row.revisionDate) != str(summoner.revision_date):
-            summoner_row.profile_icon_id = summoner.profile_icon_id,
-            summoner_row.revisionDate = summoner.revision_date,
-            summoner_row.level = summoner.level,
-            summoner_row.mastery_score = summoner.mastery_score
-            summoner_row.save()
-
 
 try:
-    player = Summoner('player')
+    player = summoner_db('player')
     print(player.level)
     print(player.mastery_score)
-    store_summoner(player)
 except SummonerNameInvalid:
     pass
 except SummonerNotFound:
