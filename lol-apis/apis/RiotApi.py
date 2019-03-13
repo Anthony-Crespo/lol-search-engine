@@ -56,15 +56,12 @@ class RiotApi:
         else:
             raise KeyError("There is no such region available.")
 
-    def request_api(self, func):
-        """The wrapper aka decorator function for requests"""
-        pass
-
     def region_valid(self, region: str):
-        """Return region if valid or default region if not"""
+        """Set and return region if valid or return default region if not"""
         if not region or region not in REGION_URL:
             return self.default_region
         else:
+            self.set_region(region)
             return region
 
     # Possibility to implement search by account ID, PUUID, summoner ID
