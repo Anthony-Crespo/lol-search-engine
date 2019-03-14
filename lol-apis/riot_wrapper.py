@@ -21,10 +21,13 @@ def summoner_db(summoner_name, region = riot_api.default_region):
     if up to date in DB return row and stop requesting data from apis
     else update before returning
     if summoner missing from DB create row before returning it
+
+    Note: riot_api.default_region is used here because get_summoner update it
+    on call. (region can have typos but not riot_api.default_region)
     """
     summoner = riot_api.get_summoner(summoner_name, region)
     try:
-        summoner_row = Summoner.get(name=summoner['name'], region=region)
+        summoner_row = Summoner.get(name=summoner['name'], region=riot_api.default_region)
         if summoner['revisionDate'] == summoner_row.revisionDate:
             pass
         else:
@@ -37,14 +40,14 @@ def summoner_db(summoner_name, region = riot_api.default_region):
     except DoesNotExist:
         try:
             Summoner.create(
-                region = region,
+                region = riot_api.default_region,
                 name = summoner['name'],
                 profile_icon_id = summoner['profileIconId'],
                 revisionDate = summoner['revisionDate'],
                 level = summoner['summonerLevel'],
                 mastery_score = riot_api.get_total_mastery(summoner['id'])
             )
-            return Summoner.get(name=summoner['name'], region=region)
+            return Summoner.get(name=summoner['name'], region=riot_api.default_region)
         except IntegrityError:
             pass
 

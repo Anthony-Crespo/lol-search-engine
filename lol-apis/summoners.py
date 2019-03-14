@@ -5,7 +5,7 @@ db = SqliteDatabase('summoners.db')
 
 class Summoner(Model):
     region = CharField(max_length=5)
-    name = CharField(max_length=32, unique=True)
+    name = CharField(max_length=32)
     profile_icon_id = IntegerField()
     revisionDate = IntegerField()
     level = IntegerField(default=0)
@@ -18,8 +18,12 @@ class Summoner(Model):
         indexes = (
         (('region', 'name'), True),
         )
+
+def initialize():
+    """Create the database and the table if they don't exist."""
+    db.connect()
+    db.create_tables([Summoner], safe=True)
     
 
 if __name__ == '__main__':
-    db.connect()
-    db.create_tables([Summoner], safe=True)
+    initialize()
