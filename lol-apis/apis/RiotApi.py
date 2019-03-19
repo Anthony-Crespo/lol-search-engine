@@ -119,3 +119,33 @@ class RiotApi:
         response = requests.get(url, params=params)
         notOk(response)
         return response.json()
+
+    # need to add the filters support
+    def get_match_history(self, accountId, region = '', champion = False, queue = False, season = False):
+        """MATCH-V4 on Riot API (More in Riot official docs)
+        
+        Get the match history of an account with optional filter
+
+        Args (optional):
+            champion[int]: Set of champion IDs for filtering the matchlist.
+            queue[int]: Set of queue IDs for filtering the matchlist. (420 for rank, 400 for normal)
+            season[int]: Set of season IDs for filtering the matchlist.
+        Returns: 
+            MatchlistDto the JSON response (dict) representing a summoner match history
+        Raises:
+            Customs errors from notOk : if response status code not 200
+
+        """
+        region = self.region_valid(region)
+        url = (REGION_URL[region] 
+            + '/lol/match/v4/matchlists/by-account/' + accountId
+        )
+        params = {
+            'champion' : '',
+            'queue' : '',
+            'season' : '',
+            'api_key' : self.api_key
+        }
+        response = requests.get(url, params=params)
+        notOk(response)
+        return response.json()
