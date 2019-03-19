@@ -29,33 +29,29 @@ def summoner_db(summoner_name, region = riot_api.default_region):
     summoner = riot_api.get_summoner(summoner_name, region)
     try:
         summoner_row = Summoner.get(name=summoner['name'], region=riot_api.default_region)
-        if summoner['revisionDate'] == summoner_row.revisionDate:
-            pass
-        else:
+        if summoner['revisionDate'] != summoner_row.revisionDate:
             summoner_row.profile_icon_id = summoner['profileIconId']
             summoner_row.revisionDate = summoner['revisionDate']
             summoner_row.level = summoner['summonerLevel']
             summoner_row.mastery_score = riot_api.get_total_mastery(summoner['id'])
             summoner_row.save()
-        data = summoner_row
+            data = summoner_row
     except DoesNotExist:
-        try:
-            Summoner.create(
-                accountId = summoner['accountId'],
-                region = riot_api.default_region,
-                name = summoner['name'],
-                profile_icon_id = summoner['profileIconId'],
-                revisionDate = summoner['revisionDate'],
-                level = summoner['summonerLevel'],
-                mastery_score = riot_api.get_total_mastery(summoner['id'])
-            )
-            data = Summoner.get(name=summoner['name'], region=riot_api.default_region)
-        except IntegrityError:
-            return False  # When does this happen? Check in to it...
+        Summoner.create(
+            accountId = summoner['accountId'],
+            region = riot_api.default_region,
+            name = summoner['name'],
+            profile_icon_id = summoner['profileIconId'],
+            revisionDate = summoner['revisionDate'],
+            level = summoner['summonerLevel'],
+            mastery_score = riot_api.get_total_mastery(summoner['id'])
+        )
+        data = Summoner.get(name=summoner['name'], region=riot_api.default_region)
 
     matchlist = riot_api.get_match_history(summoner['accountId'])['matches']
     for match in matchlist:
-        try:
+        query = Match.select().where(Match.gameId == match['gameId'])
+        if not query.exists():
             Match.create(
                 platformId = match['platformId'],
                 gameId = match['gameId'],
@@ -66,10 +62,6 @@ def summoner_db(summoner_name, region = riot_api.default_region):
                 role = match['role'],
                 lane = match['lane']
             )
-            print('match id:' + str(match['gameId']) + 'did create it!')
-        except IntegrityError:
-            print('match id:' + str(match['gameId']) + ' did not need to be created!')
-
     return data
 
 
