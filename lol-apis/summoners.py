@@ -3,7 +3,9 @@ from peewee import (SqliteDatabase, Model, CharField, IntegerField,
 
 db = SqliteDatabase('summoners.db')
 
+# The accountId isn't unique by key, but is it unique by dev acount?
 class Summoner(Model):
+    accountId = CharField()
     region = CharField(max_length=5)
     name = CharField(max_length=32)
     profile_icon_id = IntegerField()

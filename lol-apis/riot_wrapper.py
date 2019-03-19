@@ -40,6 +40,7 @@ def summoner_db(summoner_name, region = riot_api.default_region):
     except DoesNotExist:
         try:
             Summoner.create(
+                accountId = summoner['accountId'],
                 region = riot_api.default_region,
                 name = summoner['name'],
                 profile_icon_id = summoner['profileIconId'],
