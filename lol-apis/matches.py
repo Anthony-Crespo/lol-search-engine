@@ -33,6 +33,9 @@ class Match(Model):
     class Meta:
         database = db
         legacy_table_names=False
+        indexes = (
+        (('platformId', 'gameId'), True),
+        )
 
 def initialize():
     """Create the database and the table if they don't exist."""

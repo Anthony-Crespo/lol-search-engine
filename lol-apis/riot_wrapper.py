@@ -1,6 +1,7 @@
 from apis import RiotApi
 from apis import SummonerNameInvalid, SummonerNotFound, OverRateLimit
 from summoners import IntegrityError, DoesNotExist, Summoner
+from matches import Match
 from requests import HTTPError
 
 try:
@@ -36,7 +37,7 @@ def summoner_db(summoner_name, region = riot_api.default_region):
             summoner_row.level = summoner['summonerLevel']
             summoner_row.mastery_score = riot_api.get_total_mastery(summoner['id'])
             summoner_row.save()
-        return summoner_row
+        data = summoner_row
     except DoesNotExist:
         try:
             Summoner.create(
@@ -48,9 +49,28 @@ def summoner_db(summoner_name, region = riot_api.default_region):
                 level = summoner['summonerLevel'],
                 mastery_score = riot_api.get_total_mastery(summoner['id'])
             )
-            return Summoner.get(name=summoner['name'], region=riot_api.default_region)
+            data = Summoner.get(name=summoner['name'], region=riot_api.default_region)
         except IntegrityError:
-            pass
+            return False  # When does this happen? Check in to it...
+
+    matchlist = riot_api.get_match_history(summoner['accountId'])['matches']
+    for match in matchlist:
+        try:
+            Match.create(
+                platformId = match['platformId'],
+                gameId = match['gameId'],
+                champion = match['champion'],
+                queue = match['queue'],
+                season = match['season'],
+                timestamp = match['timestamp'],
+                role = match['role'],
+                lane = match['lane']
+            )
+            print('match id:' + str(match['gameId']) + 'did create it!')
+        except IntegrityError:
+            print('match id:' + str(match['gameId']) + ' did not need to be created!')
+
+    return data
 
 
 def summoner_data_in_db(summoner_name: str, summoner_region: str):
