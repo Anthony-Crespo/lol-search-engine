@@ -121,17 +121,20 @@ class RiotApi:
         return response.json()
 
     # need to add the filters support
-    def get_match_history(self, accountId, region = '', champion = False, queue = False, season = False):
+    # default is last 100 but you can add index filtering to go next page
+    # filter from an epoch time so old games already in db don't show
+    def get_match_history(self, accountId: str, region = '', beginTime= ''):
         """MATCH-V4 on Riot API (More in Riot official docs)
         
         Get the match history of an account with optional filter
 
         Args (optional):
+            beginTime[int]: search game played from that epoch to now.
             champion[int]: Set of champion IDs for filtering the matchlist.
-            queue[int]: Set of queue IDs for filtering the matchlist. (420 for rank, 400 for normal)
+            queue[int]: Queue ID for filtering. (420 for rank, 400 for normal)
             season[int]: Set of season IDs for filtering the matchlist.
         Returns: 
-            MatchlistDto the JSON response (dict) representing a summoner match history
+            MatchlistDto the JSON response (dict) with summoner match history
         Raises:
             Customs errors from notOk : if response status code not 200
 
@@ -141,9 +144,7 @@ class RiotApi:
             + '/lol/match/v4/matchlists/by-account/' + accountId
         )
         params = {
-            'champion' : '',
-            'queue' : '',
-            'season' : '',
+            'beginTime' : beginTime,
             'api_key' : self.api_key
         }
         response = requests.get(url, params=params)
